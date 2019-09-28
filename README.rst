@@ -106,6 +106,8 @@ Installing LuaJIT
 
 Available versions: 2.0.0 - 2.0.5, 2.1.0-beta1 - 2.1.0-beta3. ``latest`` and ``^`` version aliases point to ``2.0.5``.
 
+The `OpenResty <https://openresty.org/en/>`_ fork could be installed with the git URI option: ``--luajit https://github.com/openresty/luajit2.git@v2.1-agentzh``.
+
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
 
