@@ -906,7 +906,7 @@ class RioLua(Lua):
         "5.1", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
         "5.2.0", "5.2.1", "5.2.2", "5.2.3", "5.2.4",
         "5.3.0", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5",
-        "5.4.0", "5.4.0-work1", "5.4.0-work2", "5.4.0-alpha"
+        "5.4.0", "5.4.0-beta"
     ]
     translations = {
         "5": "5.3.5",
@@ -914,8 +914,8 @@ class RioLua(Lua):
         "5.1.0": "5.1",
         "5.2": "5.2.4",
         "5.3": "5.3.5",
-        "5.4": "5.4.0-alpha",
-        "5.4.0": "5.4.0-alpha",
+        "5.4": "5.4.0-beta",
+        "5.4.0": "5.4.0-beta",
         "^": "5.3.5",
         "latest": "5.3.5"
     }
@@ -937,9 +937,7 @@ class RioLua(Lua):
         "lua-5.3.3.tar.gz"      : "5113c06884f7de453ce57702abaac1d618307f33f6789fa870e87a59d772aca2",
         "lua-5.3.4.tar.gz"      : "f681aa518233bc407e23acf0f5887c884f17436f000d453b2491a9f11a52400c",
         "lua-5.3.5.tar.gz"      : "0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac",
-        "lua-5.4.0-work1.tar.gz": "ada03980481110bfde44b3bd44bde4b03d72c84318b34d657b5b5a91ddb3912c",
-        "lua-5.4.0-work2.tar.gz": "68b7e8f1ff561b9a7e1c29de26ff99ac2a704773c0965a4fe1800b7657d5a057",
-        "lua-5.4.0-alpha.tar.gz": "d8504506ede2dbac73c5a74235feaabb2101caff59c7f87efe774b24a10e8407",
+        "lua-5.4.0-beta.tar.gz" : "5eb2824bc08469be9d9282c7298f001830ea013179ad0ae8a50600332568ebb9",
     }
     all_patches = {
         "When loading a file, Lua may call the reader function again after it returned end of input": """
@@ -1267,7 +1265,7 @@ class RioLua(Lua):
         return "{}-{}.tar.gz".format(self.name, self.version)
 
     def get_download_urls(self):
-        if "work" in self.version or "alpha" in self.version:
+        if "work" in self.version or "alpha" in self.version or "beta" in self.version:
             return ["{}/{}".format(self.work_base_download_url, self.get_download_name())]
         else:
             return ["{}/{}".format(base_download_url, self.get_download_name()) for base_download_url in self.base_download_urls]
@@ -2102,7 +2100,7 @@ def main(argv=None):
     parser.add_argument(
         "-l", "--lua", help="Version of standard PUC-Rio Lua to install. "
         "Version can be specified as a version number, e.g. 5.2 or 5.3.1. "
-        "Versions 5.1.0 - 5.3.5 and 5.4.0-work1 - 5.4.0-alpha are supported. "
+        "Versions 5.1.0 - 5.3.5 and 5.4.0-beta are supported. "
         "'latest' and '^' are aliases for 5.3.5. "
         "If the argument contains '@', sources will be downloaded "
         "from a git repo using URI before '@' and using part after '@' as git reference "
