@@ -1797,8 +1797,8 @@ class LuaRocks(Program):
 
     def build(self):
         self.lua_identifiers = self.all_identifiers.get("lua",
-                               self.all_identifiers.get("LuaJIT",
-                               self.all_identifiers.get("moonjit")))
+                                                        self.all_identifiers.get("LuaJIT",
+                                                                                 self.all_identifiers.get("moonjit")))
 
         if self.lua_identifiers is None:
             sys.exit("Error: can't install LuaRocks: Lua is not present in {}".format(opts.location))
