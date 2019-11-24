@@ -1635,6 +1635,30 @@ class LuaJIT(Lua):
 
             copy_dir("jit", jitlib_path)
 
+class MoonJIT(LuaJIT):
+    name = "moonjit"
+    title = "moonjit"
+    base_download_url = "https://github.com/moonjit/moonjit/archive"
+    default_repo = "https://github.com/moonjit/moonjit"
+    versions = [
+        "2.1.1", "2.1.2"
+    ]
+    translations = {
+        "2.1": "2.1.2",
+        "^": "2.1.2",
+        "latest": "2.1.2"
+    }
+    checksums = {
+        "moonjit-2.1.1.tar.gz": "aa04d47f23bf24173e58dff0a727e8061fb88c07966a956bd86b13dae5542616",
+        "moonjit-2.1.2.tar.gz": "c3de8e29aa617fc594c043f57636ab9ad71af2b4a3a513932b05f5cdaa4320b2",
+    }
+
+    def get_download_name(self):
+        return "{}-{}.tar.gz".format(self.name, self.version)
+
+    def get_download_urls(self):
+        return ["{}/{}.tar.gz".format(self.base_download_url, self.version)]
+
 class LuaRocks(Program):
     name = "luarocks"
     title = "LuaRocks"
@@ -1772,7 +1796,9 @@ class LuaRocks(Program):
                 opts.location, "etc", "luarocks", "config-{}.lua".format(self.lua_identifiers["major version"]))
 
     def build(self):
-        self.lua_identifiers = self.all_identifiers.get("lua", self.all_identifiers.get("LuaJIT"))
+        self.lua_identifiers = self.all_identifiers.get("lua",
+                               self.all_identifiers.get("LuaJIT",
+                               self.all_identifiers.get("moonjit")))
 
         if self.lua_identifiers is None:
             sys.exit("Error: can't install LuaRocks: Lua is not present in {}".format(opts.location))
@@ -2063,6 +2089,15 @@ def install_programs(vs_already_set_up):
 
         os.chdir(start_dir)
 
+    if opts.moonjit:
+        if "lua" in identifiers:
+            del identifiers["lua"]
+
+        if MoonJIT(opts.moonjit).update_identifiers(identifiers):
+            save_installed_identifiers(identifiers)
+
+        os.chdir(start_dir)
+
     if opts.luarocks:
         if LuaRocks(opts.luarocks).update_identifiers(identifiers):
             save_installed_identifiers(identifiers)
@@ -2115,6 +2150,12 @@ def main(argv=None):
         "Versions 2.0.0 - 2.1.0-beta3 are supported. "
         "'latest' and '^' are aliases for to 2.0.5. "
         "Default git repo is https://github.com/luajit/luajit. ")
+    parser.add_argument(
+        "-m", "--moonjit", help="Version of moonjit to install. "
+        "Version can be specified in the same way as for standard Lua. "
+        "Versions 2.1.1 - 2.1.2 are supported. "
+        "'latest' and '^' are aliases for to 2.1.2. "
+        "Default git repo is https://github.com/moonjit/moonjit. ")
     parser.add_argument(
         "-r", "--luarocks", help="Version of LuaRocks to install. "
         "Version can be specified in the same way as for standard Lua. "
@@ -2186,13 +2227,21 @@ def main(argv=None):
 
     global opts
     opts = parser.parse_args(argv)
-    if not opts.lua and not opts.luajit and not opts.luarocks and not opts.show:
-        parser.error("a version of Lua, LuaJIT, or LuaRocks needs to be specified unless --show is used")
+    nb_lua = 0
+    if opts.lua:
+        nb_lua += 1
+    if opts.luajit:
+        nb_lua += 1
+    if opts.moonjit:
+        nb_lua += 1
 
-    if opts.lua and opts.luajit:
-        parser.error("can't install both PUC-Rio Lua and LuaJIT")
+    if nb_lua == 0 and not opts.luarocks and not opts.show:
+        parser.error("a version of Lua, LuaJIT, moonjit, or LuaRocks needs to be specified unless --show is used")
 
-    if opts.lua or opts.luajit or opts.luarocks:
+    if nb_lua > 1:
+        parser.error("can't install more than one Lua interpreter")
+
+    if nb_lua == 1 or opts.luarocks:
         install_programs(argv is not None)
 
     if opts.show:

@@ -9,7 +9,10 @@ hererocks
 
 |travis| |appveyor|
 
-``hererocks`` is a single file Python 2.7/3.x script for installing `Lua <http://http://www.lua.org/>`_ (or `LuaJIT <http://luajit.org/>`_) and `LuaRocks <https://luarocks.org/>`_, its package manager, into a local directory. It configures Lua to only see packages installed by that bundled version of LuaRocks, so that the installation is isolated.
+``hererocks`` is a single file Python 2.7/3.x script for installing `Lua <http://http://www.lua.org/>`_
+(or `LuaJIT <http://luajit.org/>`_ or `moonjit <https://github.com/moonjit/moonjit>`_)
+and `LuaRocks <https://luarocks.org/>`_, its package manager, into a local directory.
+It configures Lua to only see packages installed by that bundled version of LuaRocks, so that the installation is isolated.
 
 Basic usage
 -----------
@@ -81,7 +84,8 @@ After installation Lua and LuaRocks binaries will be in the ``bin`` subdirectory
 Version selection
 ^^^^^^^^^^^^^^^^^
 
-``--lua/-l``, ``--luajit/-j`` and ``--luarocks/-r`` options select versions of programs to install. There are three ways to specify how to fetch the sources:
+``--lua/-l``, ``--luajit/-j``, ``--moonjit/-m`` and ``--luarocks/-r`` options select versions of programs to install.
+There are three ways to specify how to fetch the sources:
 
 * Using version number, such as ``5.1.5``. If patch or minor versions are left out the latest possible version will be used, e.g. for Lua ``5.2`` is currently equivalent to ``5.2.4`` and for LuaJIT ``2.1`` is same as ``2.1.0-beta3``. ``latest`` or ``^`` can be used to select the latest stable version. ``hererocks`` will fetch and unpack sources of the selected version from corresponding downloads location, verifying their SHA256 checksum.
 * Using git URI plus reference to checkout, separated by ``@``. Default reference is ``master``, and there are default git URIs for Lua (https://github.com/lua/lua), LuaJIT (https://github.com/luajit/luajit) and LuaRocks (https://github.com/luarocks/luarocks). For instance, ``--luajit @458a40b`` installs from a commit at the LuaJIT git repository and ``--luajit @`` installs from its master branch. ``hererocks`` will use ``git`` command for cloning.
@@ -107,6 +111,11 @@ Installing LuaJIT
 Available versions: 2.0.0 - 2.0.5, 2.1.0-beta1 - 2.1.0-beta3. ``latest`` and ``^`` version aliases point to ``2.0.5``.
 
 The `OpenResty <https://openresty.org/en/>`_ fork could be installed with the git URI option: ``--luajit https://github.com/openresty/luajit2.git@v2.1-agentzh``.
+
+Installing moonjit
+^^^^^^^^^^^^^^^^^^
+
+Available versions: 2.1.1 - 2.1.2. ``latest`` and ``^`` version aliases point to ``2.1.2``.
 
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
