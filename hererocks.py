@@ -1641,16 +1641,19 @@ class MoonJIT(LuaJIT):
     base_download_url = "https://github.com/moonjit/moonjit/archive"
     default_repo = "https://github.com/moonjit/moonjit"
     versions = [
-        "2.1.1", "2.1.2"
+        "2.1.1", "2.1.2",
+        "2.2.0"
     ]
     translations = {
         "2.1": "2.1.2",
+        "2.2": "2.2.0",
         "^": "2.1.2",
         "latest": "2.1.2"
     }
     checksums = {
         "moonjit-2.1.1.tar.gz": "aa04d47f23bf24173e58dff0a727e8061fb88c07966a956bd86b13dae5542616",
         "moonjit-2.1.2.tar.gz": "c3de8e29aa617fc594c043f57636ab9ad71af2b4a3a513932b05f5cdaa4320b2",
+        "moonjit-2.2.0.tar.gz": "83deb2c880488dfe7dd8ebf09e3b1e7613ef4b8420de53de6f712f01aabca2b6",
     }
 
     def get_download_name(self):
@@ -2153,7 +2156,7 @@ def main(argv=None):
     parser.add_argument(
         "-m", "--moonjit", help="Version of moonjit to install. "
         "Version can be specified in the same way as for standard Lua. "
-        "Versions 2.1.1 - 2.1.2 are supported. "
+        "Versions 2.1.1 - 2.2.0 are supported. "
         "'latest' and '^' are aliases for to 2.1.2. "
         "Default git repo is https://github.com/moonjit/moonjit. ")
     parser.add_argument(

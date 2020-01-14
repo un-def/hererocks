@@ -115,7 +115,7 @@ The `OpenResty <https://openresty.org/en/>`_ fork could be installed with the gi
 Installing moonjit
 ^^^^^^^^^^^^^^^^^^
 
-Available versions: 2.1.1 - 2.1.2. ``latest`` and ``^`` version aliases point to ``2.1.2``.
+Available versions: 2.1.1 - 2.2.0. ``latest`` and ``^`` version aliases point to ``2.1.2``.
 
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
