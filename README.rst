@@ -120,7 +120,7 @@ Available versions: 2.1.1 - 2.2.0. ``latest`` and ``^`` version aliases point to
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
 
-Available versions: 2.0.8 - 2.0.13, 2.1.0 - 2.1.2, 2.2.0 - 2.2.2, 2.3.0, 2.4.0 - 2.4.4, 3.0.0 - 3.0.4, 3.1.0 - 3.1.3, 3.2.0 - 3.2.1. ``latest`` and ``^`` version aliases point to ``3.2.1``.
+Available versions: 2.0.8 - 2.0.13, 2.1.0 - 2.1.2, 2.2.0 - 2.2.2, 2.3.0, 2.4.0 - 2.4.4, 3.0.0 - 3.0.4, 3.1.0 - 3.1.3, 3.2.0 - 3.2.1, 3.3.0. ``latest`` and ``^`` version aliases point to ``3.3.0``.
 
 Version 2.0.8 does not support Lua 5.2. Versions 2.0.8 - 2.1.2 do not support Lua 5.3.
 
