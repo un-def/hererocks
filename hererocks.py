@@ -1214,6 +1214,18 @@ class RioLua(Lua):
                if (nasize < oldasize) {  /* array part must shrink? */
                  t->sizearray = nasize;
                  /* re-insert elements from vanishing slice */
+        """,
+        "Joining an upvalue with itself can cause a use-after-free crash": """
+            lapi.c:
+            @@ -1289,6 +1289,8 @@
+               LClosure *f1;
+               UpVal **up1 = getupvalref(L, fidx1, n1, &f1);
+               UpVal **up2 = getupvalref(L, fidx2, n2, NULL);
+            +  if (*up1 == *up2)
+            +    return;
+               luaC_upvdeccount(L, *up1);
+               *up1 = *up2;
+               (*up1)->refcount++;
         """
     }
     patches_per_version = {
@@ -1241,6 +1253,11 @@ class RioLua(Lua):
                 "Dead keys with nil values can stay in weak tables",
                 "lua_pushcclosure should not call the garbage collector when n is zero",
                 "Memory-allocation error when resizing a table can leave it in an inconsistent state"
+            ]
+        },
+        "5.3": {
+            "5": [
+                "Joining an upvalue with itself can cause a use-after-free crash"
             ]
         }
     }
