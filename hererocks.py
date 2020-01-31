@@ -1253,9 +1253,7 @@ class RioLua(Lua):
                 "Dead keys with nil values can stay in weak tables",
                 "lua_pushcclosure should not call the garbage collector when n is zero",
                 "Memory-allocation error when resizing a table can leave it in an inconsistent state"
-            ]
-        },
-        "5.3": {
+            ],
             "5": [
                 "Joining an upvalue with itself can cause a use-after-free crash"
             ]
