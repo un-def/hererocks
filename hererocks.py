@@ -580,7 +580,7 @@ class Program(object):
 
         archive.extractall(temp_dir)
         archive.close()
-        os.chdir(os.path.join(temp_dir, strip_extensions(self.get_download_name())))
+        os.chdir(os.path.join(temp_dir, re.sub("-rc[0-9]*$", "", strip_extensions(self.get_download_name()))))
         self.fetched = True
 
     def set_identifiers(self):
@@ -1280,7 +1280,7 @@ class RioLua(Lua):
         return "{}-{}.tar.gz".format(self.name, self.version)
 
     def get_download_urls(self):
-        if "work" in self.version or "alpha" in self.version or "beta" in self.version:
+        if "work" in self.version or "alpha" in self.version or "beta" in self.version or "rc" in self.version:
             return ["{}/{}".format(self.work_base_download_url, self.get_download_name())]
         else:
             return ["{}/{}".format(base_download_url, self.get_download_name()) for base_download_url in self.base_download_urls]
