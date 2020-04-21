@@ -906,7 +906,7 @@ class RioLua(Lua):
         "5.1", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
         "5.2.0", "5.2.1", "5.2.2", "5.2.3", "5.2.4",
         "5.3.0", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5",
-        "5.4.0", "5.4.0-beta"
+        "5.4.0", "5.4.0-rc1"
     ]
     translations = {
         "5": "5.3.5",
@@ -914,8 +914,8 @@ class RioLua(Lua):
         "5.1.0": "5.1",
         "5.2": "5.2.4",
         "5.3": "5.3.5",
-        "5.4": "5.4.0-beta",
-        "5.4.0": "5.4.0-beta",
+        "5.4": "5.4.0-rc1",
+        "5.4.0": "5.4.0-rc1",
         "^": "5.3.5",
         "latest": "5.3.5"
     }
@@ -937,7 +937,7 @@ class RioLua(Lua):
         "lua-5.3.3.tar.gz"      : "5113c06884f7de453ce57702abaac1d618307f33f6789fa870e87a59d772aca2",
         "lua-5.3.4.tar.gz"      : "f681aa518233bc407e23acf0f5887c884f17436f000d453b2491a9f11a52400c",
         "lua-5.3.5.tar.gz"      : "0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac",
-        "lua-5.4.0-beta.tar.gz" : "5eb2824bc08469be9d9282c7298f001830ea013179ad0ae8a50600332568ebb9",
+        "lua-5.4.0-rc1.tar.gz"  : "0a4fb4cb9281d924799650a768e61723fac3f0329bca39e51b90d1acc4228e71",
     }
     all_patches = {
         "When loading a file, Lua may call the reader function again after it returned end of input": """
