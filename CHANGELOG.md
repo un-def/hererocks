@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.21.0 (2020-O4-21)
+
+### New features and improvements
+
+* Added support for Lua 5.4.0-rc1
+* Added support for rc versions of Lua
+
 ## 0.20.0 (2018-09-10)
 
 ### New features and improvements

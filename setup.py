@@ -9,13 +9,15 @@ readme.close()
 
 setuptools.setup(
     name="hererocks",
-    version="0.20.0",
+    version="0.21.0",
     description="Tool for installing Lua and LuaRocks locally",
     long_description=long_description,
     keywords="lua",
     url="https://github.com/luarocks/hererocks",
+    # Original author
     author="Peter Melnichenko",
-    author_email="mpeterval@gmail.com",
+    # Contact email for current maintainers
+    author_email="hisham@luarocks.org",
     license="MIT",
     classifiers=[
         "Development Status :: 4 - Beta",
