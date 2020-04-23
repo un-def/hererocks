@@ -5,6 +5,10 @@
 ### New features and improvements
 
 * Added support for Lua 5.4.0-rc1
+* Added support for LuaRocks 3.0.3 - 3.3.1. `latest` and `^` aliases
+  point to `3.3.1`.
+* Added support for moonjit 2.2.0
+* Added support for RaptorJIT
 * Added support for rc versions of Lua
 
 ## 0.20.0 (2018-09-10)
