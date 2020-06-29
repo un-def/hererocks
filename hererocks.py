@@ -906,18 +906,17 @@ class RioLua(Lua):
         "5.1", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
         "5.2.0", "5.2.1", "5.2.2", "5.2.3", "5.2.4",
         "5.3.0", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5",
-        "5.4.0", "5.4.0-rc1"
+        "5.4.0"
     ]
     translations = {
-        "5": "5.3.5",
+        "5": "5.4.0",
         "5.1": "5.1.5",
         "5.1.0": "5.1",
         "5.2": "5.2.4",
         "5.3": "5.3.5",
-        "5.4": "5.4.0-rc1",
-        "5.4.0": "5.4.0-rc1",
-        "^": "5.3.5",
-        "latest": "5.3.5"
+        "5.4": "5.4.0",
+        "^": "5.4.0",
+        "latest": "5.4.0"
     }
     checksums = {
         "lua-5.1.tar.gz"        : "7f5bb9061eb3b9ba1e406a5aa68001a66cb82bac95748839dc02dd10048472c1",
@@ -937,7 +936,7 @@ class RioLua(Lua):
         "lua-5.3.3.tar.gz"      : "5113c06884f7de453ce57702abaac1d618307f33f6789fa870e87a59d772aca2",
         "lua-5.3.4.tar.gz"      : "f681aa518233bc407e23acf0f5887c884f17436f000d453b2491a9f11a52400c",
         "lua-5.3.5.tar.gz"      : "0c2eed3f960446e1a3e4b9a1ca2f3ff893b6ce41942cf54d5dd59ab4b3b058ac",
-        "lua-5.4.0-rc1.tar.gz"  : "0a4fb4cb9281d924799650a768e61723fac3f0329bca39e51b90d1acc4228e71",
+        "lua-5.4.0.tar.gz"      : "eac0836eb7219e421a96b7ee3692b93f0629e4cdb0c788432e3d10ce9ed47e28",
     }
     all_patches = {
         "When loading a file, Lua may call the reader function again after it returned end of input": """
@@ -2227,8 +2226,8 @@ def main(argv=None):
     parser.add_argument(
         "-l", "--lua", help="Version of standard PUC-Rio Lua to install. "
         "Version can be specified as a version number, e.g. 5.2 or 5.3.1. "
-        "Versions 5.1.0 - 5.3.5 and 5.4.0-rc1 are supported. "
-        "'latest' and '^' are aliases for 5.3.5. "
+        "Versions 5.1.0 - 5.4.0 are supported. "
+        "'latest' and '^' are aliases for 5.4.0. "
         "If the argument contains '@', sources will be downloaded "
         "from a git repo using URI before '@' and using part after '@' as git reference "
         "to checkout, 'master' by default. "
