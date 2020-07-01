@@ -57,11 +57,10 @@ class TestCLI(unittest.TestCase):
         self.assertHererocksSuccess(["--lua", "latest", "--luarocks", "latest"])
         self.assertHererocksSuccess(["--show"], ["Programs installed in", "Compat: default"])
         self.assertSuccess(["lua", "-v"], ["Lua 5.4.0"])
-        self.assertSuccess(["lua", "-e", "assert(bit32)"])
 
         self.assertSuccess(["luarocks", "--version"])
         self.assertSuccess(["luarocks", "make", os.path.join("test", "hererocks-test-scm-1.rockspec")])
-        self.assertSuccess(["hererocks-test"], ["Lua 5.3"])
+        self.assertSuccess(["hererocks-test"], ["Lua 5.4"])
 
         self.assertHererocksSuccess(["--lua", "latest", "--luarocks", "latest"], ["already installed"])
         self.assertHererocksSuccess(["--luarocks", "latest", "--ignore-installed"], ["Fetching", "cached"])
