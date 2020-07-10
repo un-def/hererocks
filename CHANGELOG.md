@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.22.0 (2020-07-10)
+
+### New features and improvements
+
+* Support for Lua 5.4.0
+
+### Fixes
+
+* Fix activate_posix to work with Bash POSIX mode
+
 ## 0.21.0 (2020-04-21)
 
 ### New features and improvements
