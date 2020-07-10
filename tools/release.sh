@@ -72,9 +72,10 @@ python3 setup.py sdist bdist_wheel
 [ -d dist ] || die "no dist!?"
 
 twine upload --repository hererocks dist/hererocks-$version*
-git tag $version
 git push origin $version
 git checkout latest
 git reset --hard $version
 git push --force
+git checkout master
+git push
 
