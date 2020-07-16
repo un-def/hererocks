@@ -1225,6 +1225,117 @@ class RioLua(Lua):
                luaC_upvdeccount(L, *up1);
                *up1 = *up2;
                (*up1)->refcount++;
+        """,
+        "Old finalized object may not be visited by GC": """
+            lgc.c:
+            @@ -1140,7 +1140,7 @@ static void finishgencycle (lua_State *L, global_State *g) {
+             static void youngcollection (lua_State *L, global_State *g) {
+               GCObject **psurvival;  /* to point to first non-dead survival object */
+               lua_assert(g->gcstate == GCSpropagate);
+            -  markold(g, g->survival, g->reallyold);
+            +  markold(g, g->allgc, g->reallyold);
+               markold(g, g->finobj, g->finobjrold);
+               atomic(L);
+        """,
+        "Computation of stack limit when entering a coroutine is wrong": """
+            ldo.c:
+            @@ -674,7 +674,7 @@ LUA_API int lua_resume (lua_State *L, lua_State *from, int nargs,
+               if (from == NULL)
+                 L->nCcalls = CSTACKTHREAD;
+               else  /* correct 'nCcalls' for this thread */
+            -    L->nCcalls = getCcalls(from) + from->nci - L->nci - CSTACKCF;
+            +    L->nCcalls = getCcalls(from) - L->nci - CSTACKCF;
+               if (L->nCcalls <= CSTACKERR)
+                 return resume_error(L, "C stack overflow", nargs);
+               luai_userstateresume(L, nargs);
+        """,
+        "An emergency collection when handling an error while loading the upvalues of a function can cause a segfault": """
+            lundump.c:
+            @@ -205,8 +205,9 @@ static void loadUpvalues (LoadState *S, Proto *f) {
+               n = loadInt(S);
+               f->upvalues = luaM_newvectorchecked(S->L, n, Upvaldesc);
+               f->sizeupvalues = n;
+            -  for (i = 0; i < n; i++) {
+            +  for (i = 0; i < n; i++)
+                 f->upvalues[i].name = NULL;
+            +  for (i = 0; i < n; i++) {
+                 f->upvalues[i].instack = loadByte(S);
+                 f->upvalues[i].idx = loadByte(S);
+                 f->upvalues[i].kind = loadByte(S);
+        """,
+        "'checkstackp' can run a GC step and destroy a preallocated CallInfo": """
+            ldo.c:
+            @@ -466,13 +466,13 @@ void luaD_call (lua_State *L, StkId func, int nresults) {
+                   f = fvalue(s2v(func));
+                  Cfunc: {
+                   int n;  /* number of returns */
+            -      CallInfo *ci = next_ci(L);
+            +      CallInfo *ci;
+                   checkstackp(L, LUA_MINSTACK, func);  /* ensure minimum stack size */
+            +      L->ci = ci = next_ci(L);
+                   ci->nresults = nresults;
+                   ci->callstatus = CIST_C;
+                   ci->top = L->top + LUA_MINSTACK;
+                   ci->func = func;
+            -      L->ci = ci;
+                   lua_assert(ci->top <= L->stack_last);
+                   if (L->hookmask & LUA_MASKCALL) {
+                     int narg = cast_int(L->top - func) - 1;
+            @@ -486,18 +486,18 @@ void luaD_call (lua_State *L, StkId func, int nresults) {
+                   break;
+                 }
+                 case LUA_VLCL: {  /* Lua function */
+            -      CallInfo *ci = next_ci(L);
+            +      CallInfo *ci;
+                   Proto *p = clLvalue(s2v(func))->p;
+                   int narg = cast_int(L->top - func) - 1;  /* number of real arguments */
+                   int nfixparams = p->numparams;
+                   int fsize = p->maxstacksize;  /* frame size */
+                   checkstackp(L, fsize, func);
+            +      L->ci = ci = next_ci(L);
+                   ci->nresults = nresults;
+                   ci->u.l.savedpc = p->code;  /* starting point */
+                   ci->callstatus = 0;
+                   ci->top = func + 1 + fsize;
+                   ci->func = func;
+            -      L->ci = ci;
+                   for (; narg < nfixparams; narg++)
+                     setnilvalue(s2v(L->top++));  /* complete missing arguments */
+                   lua_assert(ci->top <= L->stack_last);
+        """,
+        "GC after resizing stack can shrink it again": """
+            ldo.h:
+            @@ -44,7 +44,7 @@
+
+             /* macro to check stack size and GC */
+             #define checkstackGC(L,fsize)  \\
+            -	luaD_checkstackaux(L, (fsize), (void)0, luaC_checkGC(L))
+            +	luaD_checkstackaux(L, (fsize), luaC_checkGC(L), (void)0)
+
+
+             /* type of protected functions, to be ran by 'runprotected' */
+        """,
+        "Errors in finalizers need a valid 'pc' to produce an error message": """
+            lvm.c:
+            @@ -1104,7 +1104,7 @@ void luaV_finishOp (lua_State *L) {
+
+
+             #define checkGC(L,c)  \\
+            -	{ luaC_condGC(L, L->top = (c),  /* limit of live values */ \\
+            +	{ luaC_condGC(L, (savepc(L), L->top = (c)), \\
+                                      updatetrap(ci)); \\
+                        luai_threadyield(L); }
+
+            @@ -1792,8 +1792,7 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+                     vmbreak;
+                   }
+                   vmcase(OP_VARARGPREP) {
+            -        luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p);
+            -        updatetrap(ci);
+            +        ProtectNT(luaT_adjustvarargs(L, GETARG_A(i), ci, cl->p));
+                     if (trap) {
+                       luaD_hookcall(L, ci);
+                       L->oldpc = pc + 1;  /* next opcode will be seen as a "new" line */
         """
     }
     patches_per_version = {
@@ -1256,7 +1367,17 @@ class RioLua(Lua):
             "5": [
                 "Joining an upvalue with itself can cause a use-after-free crash"
             ]
-        }
+        },
+        "5.4": {
+            "0": [
+                "Old finalized object may not be visited by GC",
+                "Computation of stack limit when entering a coroutine is wrong",
+                "An emergency collection when handling an error while loading the upvalues of a function can cause a segfault",
+                "'checkstackp' can run a GC step and destroy a preallocated CallInfo",
+                "GC after resizing stack can shrink it again",
+                "Errors in finalizers need a valid 'pc' to produce an error message"
+            ]
+        },
     }
 
     def __init__(self, version):
