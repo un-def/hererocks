@@ -1336,6 +1336,30 @@ class RioLua(Lua):
                      if (trap) {
                        luaD_hookcall(L, ci);
                        L->oldpc = pc + 1;  /* next opcode will be seen as a "new" line */
+        """,
+        "'popen' can crash if called with an invalid mode": """
+            liolib.c:
+            @@ -279,6 +279,8 @@ static int io_popen (lua_State *L) {
+               const char *filename = luaL_checkstring(L, 1);
+               const char *mode = luaL_optstring(L, 2, "r");
+               LStream *p = newprefile(L);
+            +  luaL_argcheck(L, ((mode[0] == 'r' || mode[0] == 'w') && mode[1] == '\0'),
+            +                   2, "invalid mode");
+               p->f = l_popen(L, filename, mode);
+               p->closef = &io_pclose;
+               return (p->f == NULL) ? luaL_fileresult(L, 0, filename) : 1;
+        """,
+        "Field 'L->oldpc' is not always updated when returning to a function": """
+            lgc.c:
+            @@ -856,6 +856,8 @@ static void GCTM (lua_State *L) {
+                 if (unlikely(status != LUA_OK)) {  /* error while running __gc? */
+                   luaE_warnerror(L, "__gc metamethod");
+                   L->top--;  /* pops error object */
+            +      if (isLua(L->ci))
+            +        L->oldpc = L->ci->u.l.savedpc;  /* update 'oldpc' */
+                 }
+               }
+             }
         """
     }
     patches_per_version = {
@@ -1375,7 +1399,9 @@ class RioLua(Lua):
                 "An emergency collection when handling an error while loading the upvalues of a function can cause a segfault",
                 "'checkstackp' can run a GC step and destroy a preallocated CallInfo",
                 "GC after resizing stack can shrink it again",
-                "Errors in finalizers need a valid 'pc' to produce an error message"
+                "Errors in finalizers need a valid 'pc' to produce an error message",
+                "'popen' can crash if called with an invalid mode",
+                "Field 'L->oldpc' is not always updated when returning to a function"
             ]
         },
     }
