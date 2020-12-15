@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.23.0 (2020-12-15)
+
+* Fixed and improved CI tests
+* Added support for Lua 5.3.6, 5.4.1, 5.4.2
+* Added patches for Lua 5.4.0
+* Added support for LuaRocks 3.4.0, 3.5.0
+
 ## 0.22.0 (2020-07-10)
 
 ### New features and improvements
