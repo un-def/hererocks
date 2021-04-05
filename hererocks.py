@@ -1902,6 +1902,7 @@ class LuaRocks(Program):
         "3.3.0", "3.3.1",
         "3.4.0",
         "3.5.0",
+        "3.6.0",
     ]
     translations = {
         "2": "2.4.4",
@@ -1917,8 +1918,9 @@ class LuaRocks(Program):
         "3.3": "3.3.1",
         "3.4": "3.4.0",
         "3.5": "3.5.0",
-        "^": "3.5.0",
-        "latest": "3.5.0"
+        "3.6": "3.6.0",
+        "^": "3.6.0",
+        "latest": "3.6.0"
     }
     checksums = {
         "luarocks-2.0.10.tar.gz"   : "11731dfe6e210a962cb2a857b8b2f14a9ab1043e13af09a1b9455b486401b46e",
@@ -1987,6 +1989,8 @@ class LuaRocks(Program):
         "luarocks-3.4.0-win32.zip" : "cd2b26d34f36cfbf69e3d80a8d25c46529e367f0866c41ac96049081a5653fc0",
         "luarocks-3.5.0.tar.gz"    : "701d0cc0c7e97cc2cf2c2f4068fce45e52a8854f5dc6c9e49e2014202eec9a4f",
         "luarocks-3.5.0-win32.zip" : "69a225f339a96cdbfe8eb5fcfb108c2eef270dab172bc09e78190a8a0932ffc8",
+        "luarocks-3.6.0.tar.gz"    : "b0eaf59e7711ca2a886722c0423dabe22ccbdcdf3a042c3f2615596879f8252f",
+        "luarocks-3.6.0-win32.zip" : "ac9cc1626c4c6171e2cc9259e788934737387c76578775769986924c21b6c590",
     }
 
     def get_download_name(self):
@@ -2415,8 +2419,8 @@ def main(argv=None):
     parser.add_argument(
         "-r", "--luarocks", help="Version of LuaRocks to install. "
         "Version can be specified in the same way as for standard Lua. "
-        "Versions 2.0.8 - 3.5.0 are supported. "
-        "'latest' and '^' are aliases for 3.5.0. "
+        "Versions 2.0.8 - 3.6.0 are supported. "
+        "'latest' and '^' are aliases for 3.6.0. "
         "Default git repo is https://github.com/luarocks/luarocks. "
         "Note that Lua 5.2 is not supported in LuaRocks 2.0.8, "
         "Lua 5.3 is supported only since LuaRocks 2.2.0, Lua 5.4 is supported only since "
