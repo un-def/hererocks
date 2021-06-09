@@ -1610,7 +1610,7 @@ class RioLua(Lua):
             for src in sorted(os.listdir(".")):
                 base, ext = os.path.splitext(src)
 
-                if ext == ".c":
+                if ext == ".c" and base != "onelua":
                     obj = base + objext()
                     objs.append(obj)
 
