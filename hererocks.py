@@ -1364,6 +1364,29 @@ class RioLua(Lua):
                  }
                }
              }
+        """,
+        "Parameter 'what' of 'debug.getinfo' cannot start with '>'": """
+            ldblib.c:
+            @@ -152,6 +152,7 @@ static int db_getinfo (lua_State *L) {
+               lua_State *L1 = getthread(L, &arg);
+               const char *options = luaL_optstring(L, arg+2, "flnSrtu");
+               checkstack(L, L1, 3);
+            +  luaL_argcheck(L, options[0] != '>', arg + 2, "invalid option '>'");
+               if (lua_isfunction(L, arg + 1)) {  /* info about a function? */
+                 options = lua_pushfstring(L, ">%s", options);  /* add '>' to 'options' */
+                 lua_pushvalue(L, arg + 1);  /* move function to 'L1' stack */
+        """,
+        "Error message in 'string.concat' uses wrong format": """
+            ltablib.c:
+            @@ -146,7 +146,7 @@ static int tmove (lua_State *L) {
+             static void addfield (lua_State *L, luaL_Buffer *b, lua_Integer i) {
+               lua_geti(L, 1, i);
+               if (!lua_isstring(L, -1))
+            -    luaL_error(L, "invalid value (%s) at index %d in table for 'concat'",
+            +    luaL_error(L, "invalid value (%s) at index %I in table for 'concat'",
+                               luaL_typename(L, -1), i);
+               luaL_addvalue(b);
+             }
         """
     }
     patches_per_version = {
@@ -1406,6 +1429,10 @@ class RioLua(Lua):
                 "Errors in finalizers need a valid 'pc' to produce an error message",
                 "'popen' can crash if called with an invalid mode",
                 "Field 'L->oldpc' is not always updated when returning to a function"
+            ],
+            "2": [
+                "Parameter 'what' of 'debug.getinfo' cannot start with '>'",
+                "Error message in 'string.concat' uses wrong format"
             ]
         },
     }
