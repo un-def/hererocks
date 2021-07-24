@@ -1434,6 +1434,29 @@ class RioLua(Lua):
             +          ci->u2.nres = n;  /* save number of returns */
                        if (L->top < ci->top)
                          L->top = ci->top;
+        """,
+        "'luaL_tolstring' may get confused with negative indices": """
+            lauxlib.c:
+            @@ -881,6 +881,7 @@ LUALIB_API lua_Integer luaL_len (lua_State *L, int idx) {
+             
+             
+             LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
+            +  idx = lua_absindex(L,idx);
+               if (luaL_callmeta(L, idx, "__tostring")) {  /* metafield? */
+                 if (!lua_isstring(L, -1))
+                   luaL_error(L, "'__tostring' must return a string");
+        """,
+        "negation in macro 'luaV_shiftr' may overflow": """
+            lvm.c:
+            @@ -766,7 +766,7 @@ lua_Number luaV_modf (lua_State *L, lua_Number m, lua_Number n) {
+             /*
+             ** Shift left operation. (Shift right just negates 'y'.)
+             */
+            -#define luaV_shiftr(x,y)	luaV_shiftl(x,-(y))
+            +#define luaV_shiftr(x,y)	luaV_shiftl(x,intop(-, 0, y))
+             
+             lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
+               if (y < 0) {  /* shift right? */
         """
     }
     patches_per_version = {
@@ -1483,7 +1506,9 @@ class RioLua(Lua):
             ],
             "3": [
                 "C99 comments are not compatible with C89",
-                "Yielding in a __close metamethod called when returning vararg results mess up the returned values"
+                "Yielding in a __close metamethod called when returning vararg results mess up the returned values",
+                "'luaL_tolstring' may get confused with negative indices",
+                "negation in macro 'luaV_shiftr' may overflow"
             ]
         },
     }
