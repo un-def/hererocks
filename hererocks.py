@@ -1438,8 +1438,8 @@ class RioLua(Lua):
         "'luaL_tolstring' may get confused with negative indices": """
             lauxlib.c:
             @@ -881,6 +881,7 @@ LUALIB_API lua_Integer luaL_len (lua_State *L, int idx) {
-             
-             
+
+
              LUALIB_API const char *luaL_tolstring (lua_State *L, int idx, size_t *len) {
             +  idx = lua_absindex(L,idx);
                if (luaL_callmeta(L, idx, "__tostring")) {  /* metafield? */
@@ -1454,7 +1454,7 @@ class RioLua(Lua):
              */
             -#define luaV_shiftr(x,y)	luaV_shiftl(x,-(y))
             +#define luaV_shiftr(x,y)	luaV_shiftl(x,intop(-, 0, y))
-             
+
              lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
                if (y < 0) {  /* shift right? */
         """
