@@ -99,7 +99,7 @@ Lua and LuaJIT have some flags that add compatibility with other Lua versions. L
 Installing standard PUC-Rio Lua
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Available versions: 5.1 - 5.1.5, 5.2.0 - 5.2.4, 5.3.0 - 5.3.6, 5.4.2. ``latest`` and ``^`` version aliases point to ``5.4.2``.
+Available versions: 5.1 - 5.1.5, 5.2.0 - 5.2.4, 5.3.0 - 5.3.6, 5.4.2, 5.4.3. ``latest`` and ``^`` version aliases point to ``5.4.2``.
 
 Use ``5.1.0`` to install Lua ``5.1`` which was released without patch version for some reason.
 
@@ -127,7 +127,7 @@ Luarocks supports RaptorJIT since 3.2.0.
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
 
-Available versions: 2.0.8 - 2.4.4, 3.0.0 - 3.5.0. ``latest`` and ``^`` version aliases point to ``3.5.0``.
+Available versions: 2.0.8 - 2.4.4, 3.0.0 - 3.8.0. ``latest`` and ``^`` version aliases point to ``3.5.0``.
 
 Version 2.0.8 does not support Lua 5.2. Versions 2.0.8 - 2.1.2 do not support Lua 5.3.
 

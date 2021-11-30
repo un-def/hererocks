@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.24.0 (2021-11-30)
+
+* FreeBSD support
+* Added support for Lua 5.4.3
+* Added patches for Lua 5.4.3, 5.4.2
+* Added support for LuaRocks 3.7.0, 3.8.0
+
 ## 0.23.0 (2020-12-15)
 
 * Fixed and improved CI tests
