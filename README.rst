@@ -1,13 +1,15 @@
 hererocks
 =========
 
-.. |travis| image:: https://travis-ci.org/luarocks/hererocks.svg?branch=master
-  :target: https://travis-ci.org/luarocks/hererocks
+.. |gh-workflow| image:: https://img.shields.io/github/workflow/status/luarocks/hererocks/Run%20tests
+  :target: https://github.com/luarocks/hererocks/actions/workflows/test.yml
+  :alt: GitHub Workflow Status
 
-.. |appveyor| image:: https://ci.appveyor.com/api/projects/status/vnoe4k98tgxo9hna?svg=true
-  :target: https://ci.appveyor.com/project/hishamhm/hererocks
+.. |codecov| image:: https://img.shields.io/codecov/c/github/luarocks/hererocks
+  :target: https://app.codecov.io/gh/luarocks/hererocks
+  :alt: Codecov
 
-|travis| |appveyor|
+|gh-workflow| |codecov|
 
 ``hererocks`` is a single file Python 2.7/3.x script for installing `Lua <http://http://www.lua.org/>`_
 (or `LuaJIT <http://luajit.org/>`_ or `moonjit <https://github.com/moonjit/moonjit>`_ or `RaptorJIT <https://github.com/raptorjit/raptorjit>`_)
