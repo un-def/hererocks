@@ -906,7 +906,7 @@ class RioLua(Lua):
         "5.1", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
         "5.2.0", "5.2.1", "5.2.2", "5.2.3", "5.2.4",
         "5.3.0", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5", "5.3.6",
-        "5.4.0", "5.4.1", "5.4.2", "5.4.3"
+        "5.4.0", "5.4.1", "5.4.2", "5.4.3", "5.4.4"
     ]
     translations = {
         "5": "5.4.1",
@@ -914,9 +914,9 @@ class RioLua(Lua):
         "5.1.0": "5.1",
         "5.2": "5.2.4",
         "5.3": "5.3.6",
-        "5.4": "5.4.3",
-        "^": "5.4.3",
-        "latest": "5.4.3"
+        "5.4": "5.4.4",
+        "^": "5.4.4",
+        "latest": "5.4.4"
     }
     checksums = {
         "lua-5.1.tar.gz"        : "7f5bb9061eb3b9ba1e406a5aa68001a66cb82bac95748839dc02dd10048472c1",
@@ -941,6 +941,7 @@ class RioLua(Lua):
         "lua-5.4.1.tar.gz"      : "4ba786c3705eb9db6567af29c91a01b81f1c0ac3124fdbf6cd94bdd9e53cca7d",
         "lua-5.4.2.tar.gz"      : "11570d97e9d7303c0a59567ed1ac7c648340cd0db10d5fd594c09223ef2f524f",
         "lua-5.4.3.tar.gz"      : "f8612276169e3bfcbcfb8f226195bfc6e466fe13042f1076cbde92b7ec96bbfb",
+        "lua-5.4.4.tar.gz"      : "164c7849653b80ae67bec4b7473b884bf5cc8d2dca05653475ec2ed27b9ebf61",
     }
     all_patches = {
         "When loading a file, Lua may call the reader function again after it returned end of input": """
@@ -2502,8 +2503,8 @@ def main(argv=None):
     parser.add_argument(
         "-l", "--lua", help="Version of standard PUC-Rio Lua to install. "
         "Version can be specified as a version number, e.g. 5.2 or 5.3.1. "
-        "Versions 5.1.0 - 5.4.3 are supported. "
-        "'latest' and '^' are aliases for 5.4.3. "
+        "Versions 5.1.0 - 5.4.4 are supported. "
+        "'latest' and '^' are aliases for 5.4.4. "
         "If the argument contains '@', sources will be downloaded "
         "from a git repo using URI before '@' and using part after '@' as git reference "
         "to checkout, 'master' by default. "
