@@ -1458,6 +1458,17 @@ class RioLua(Lua):
 
              lua_Integer luaV_shiftl (lua_Integer x, lua_Integer y) {
                if (y < 0) {  /* shift right? */
+        """,
+        "Lua can generate wrong code when _ENV is <const>": """
+            lparser.c:
+            @@ -468,6 +468,7 @@ static void singlevar (LexState *ls, expdesc *var) {
+                 expdesc key;
+                 singlevaraux(fs, ls->envn, var, 1);  /* get environment variable */
+                 lua_assert(var->k != VVOID);  /* this one must exist */
+            +    luaK_exp2anyregup(fs, var);  /* but could be a constant */
+                 codestring(&key, varname);  /* key is variable name */
+                 luaK_indexed(fs, var, &key);  /* env[varname] */
+               }
         """
     }
     patches_per_version = {
@@ -1510,6 +1521,9 @@ class RioLua(Lua):
                 "Yielding in a __close metamethod called when returning vararg results mess up the returned values",
                 "'luaL_tolstring' may get confused with negative indices",
                 "negation in macro 'luaV_shiftr' may overflow"
+            ],
+            "4": [
+                "Lua can generate wrong code when _ENV is <const>"
             ]
         },
     }
