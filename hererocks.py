@@ -35,7 +35,7 @@ if os.name == "nt":
     except ImportError:
         import winreg
 
-hererocks_version = "Hererocks 0.25.0"
+hererocks_version = "Hererocks 0.25.1"
 __all__ = ["main"]
 
 opts = None

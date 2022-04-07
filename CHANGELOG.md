@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.25.1 (2022-04-07)
+
+* Add fix for MSVC 2019 detection
+* Use HTTPS for various download URLs
+
 ## 0.25.0 (2022-04-07)
 
 * Added support for Lua 5.4.4
