@@ -129,7 +129,7 @@ Luarocks supports RaptorJIT since 3.2.0.
 Installing LuaRocks
 ^^^^^^^^^^^^^^^^^^^
 
-Available versions: 2.0.8 - 2.4.4, 3.0.0 - 3.8.0. ``latest`` and ``^`` version aliases point to ``3.8.0``.
+Available versions: 2.0.8 - 2.4.4, 3.0.0 - 3.9.0. ``latest`` and ``^`` version aliases point to ``3.9.0``.
 
 Version 2.0.8 does not support Lua 5.2. Versions 2.0.8 - 2.1.2 do not support Lua 5.3.
 
