@@ -1485,8 +1485,8 @@ class RioLua(Lua):
                finishbinexpval(fs, e1, e2, op, v2, 0, line, OP_MMBIN,
                                cast(TMS, (op - OP_ADD) + TM_ADD));
             @@ -1478,7 +1481,7 @@ static void codecommutative (FuncState *fs, BinOpr op,
-             
-             
+
+
              /*
             -** Code bitwise operations; they are all associative, so the function
             +** Code bitwise operations; they are all commutative, so the function
@@ -1541,7 +1541,7 @@ class RioLua(Lua):
             +  }
                luaG_errormsg(L);
              }
-             
+
             lvm.c:
             @@ -656,8 +656,10 @@ void luaV_concat (lua_State *L, int total) {
                    /* collect total length and number of strings */
@@ -1563,7 +1563,7 @@ class RioLua(Lua):
             +    L->top = top - (n - 1);  /* popped 'n' strings and pushed one */
                } while (total > 1);  /* repeat until only 1 result left */
              }
-             
+
         """
     }
     patches_per_version = {
