@@ -1564,6 +1564,90 @@ class RioLua(Lua):
                } while (total > 1);  /* repeat until only 1 result left */
              }
 
+        """,
+        "'lua_settop' may use a pointer to stack invalidated by 'luaF_close'": """
+            lapi.c:
+            @@ -202,7 +202,7 @@ LUA_API void lua_settop (lua_State *L, int idx) {
+               newtop = L->top + diff;
+               if (diff < 0 && L->tbclist >= newtop) {
+                 lua_assert(hastocloseCfunc(ci->nresults));
+            -    luaF_close(L, newtop, CLOSEKTOP, 0);
+            +    newtop = luaF_close(L, newtop, CLOSEKTOP, 0);
+               }
+               L->top = newtop;  /* correct top only after closing any upvalue */
+               lua_unlock(L);
+            @@ -215,8 +215,7 @@ LUA_API void lua_closeslot (lua_State *L, int idx) {
+               level = index2stack(L, idx);
+               api_check(L, hastocloseCfunc(L->ci->nresults) && L->tbclist == level,
+                  "no variable to close at given level");
+            -  luaF_close(L, level, CLOSEKTOP, 0);
+            -  level = index2stack(L, idx);  /* stack may be moved */
+            +  level = luaF_close(L, level, CLOSEKTOP, 0);
+               setnilvalue(s2v(level));
+               lua_unlock(L);
+             }
+            ldo.c:
+            @@ -427,14 +427,15 @@ l_sinline void moveresults (lua_State *L, StkId res, int nres, int wanted) {
+                   break;
+                 default:  /* two/more results and/or to-be-closed variables */
+                   if (hastocloseCfunc(wanted)) {  /* to-be-closed variables? */
+            -        ptrdiff_t savedres = savestack(L, res);
+                     L->ci->callstatus |= CIST_CLSRET;  /* in case of yields */
+                     L->ci->u2.nres = nres;
+            -        luaF_close(L, res, CLOSEKTOP, 1);
+            +        res = luaF_close(L, res, CLOSEKTOP, 1);
+                     L->ci->callstatus &= ~CIST_CLSRET;
+            -        if (L->hookmask)  /* if needed, call hook after '__close's */
+            +        if (L->hookmask) {  /* if needed, call hook after '__close's */
+            +          ptrdiff_t savedres = savestack(L, res);
+                       rethook(L, L->ci, nres);
+            -        res = restorestack(L, savedres);  /* close and hook can move stack */
+            +          res = restorestack(L, savedres);  /* hook can move stack */
+            +        }
+                     wanted = decodeNresults(wanted);
+                     if (wanted == LUA_MULTRET)
+                       wanted = nres;  /* we want all results */
+            @@ -651,8 +652,7 @@ static int finishpcallk (lua_State *L,  CallInfo *ci) {
+               else {  /* error */
+                 StkId func = restorestack(L, ci->u2.funcidx);
+                 L->allowhook = getoah(ci->callstatus);  /* restore 'allowhook' */
+            -    luaF_close(L, func, status, 1);  /* can yield or raise an error */
+            -    func = restorestack(L, ci->u2.funcidx);  /* stack may be moved */
+            +    func = luaF_close(L, func, status, 1);  /* can yield or raise an error */
+                 luaD_seterrorobj(L, status, func);
+                 luaD_shrinkstack(L);   /* restore stack size in case of overflow */
+                 setcistrecst(ci, LUA_OK);  /* clear original status */
+            lfunc.c:
+            @@ -223,9 +223,9 @@ static void poptbclist (lua_State *L) {
+
+             /*
+             ** Close all upvalues and to-be-closed variables up to the given stack
+            -** level.
+            +** level. Return restored 'level'.
+             */
+            -void luaF_close (lua_State *L, StkId level, int status, int yy) {
+            +StkId luaF_close (lua_State *L, StkId level, int status, int yy) {
+               ptrdiff_t levelrel = savestack(L, level);
+               luaF_closeupval(L, level);  /* first, close the upvalues */
+               while (L->tbclist >= level) {  /* traverse tbc's down to that level */
+            @@ -234,6 +234,7 @@ void luaF_close (lua_State *L, StkId level, int status, int yy) {
+                 prepcallclosemth(L, tbc, status, yy);  /* close variable */
+                 level = restorestack(L, levelrel);
+               }
+            +  return level;
+             }
+
+
+            lfunc.h:
+            @@ -54,7 +54,7 @@ LUAI_FUNC void luaF_initupvals (lua_State *L, LClosure *cl);
+             LUAI_FUNC UpVal *luaF_findupval (lua_State *L, StkId level);
+             LUAI_FUNC void luaF_newtbcupval (lua_State *L, StkId level);
+             LUAI_FUNC void luaF_closeupval (lua_State *L, StkId level);
+            -LUAI_FUNC void luaF_close (lua_State *L, StkId level, int status, int yy);
+            +LUAI_FUNC StkId luaF_close (lua_State *L, StkId level, int status, int yy);
+             LUAI_FUNC void luaF_unlinkupval (UpVal *uv);
+             LUAI_FUNC void luaF_freeproto (lua_State *L, Proto *f);
+             LUAI_FUNC const char *luaF_getlocalname (const Proto *func, int local_number,
         """
     }
     patches_per_version = {
@@ -1620,7 +1704,8 @@ class RioLua(Lua):
             "4": [
                 "Lua can generate wrong code when _ENV is <const>",
                 "Wrong code generation for constants in bitwise operations",
-                "Lua-stack overflow when C stack overflows while handling an error"
+                "Lua-stack overflow when C stack overflows while handling an error",
+                "'lua_settop' may use a pointer to stack invalidated by 'luaF_close'"
             ]
         },
     }
