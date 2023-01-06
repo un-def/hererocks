@@ -1,7 +1,7 @@
 hererocks
 =========
 
-.. |gh-workflow| image:: https://img.shields.io/github/workflow/status/luarocks/hererocks/Run%20tests
+.. |gh-workflow| image:: https://img.shields.io/github/actions/workflow/status/luarocks/hererocks/test.yml?branch=master
   :target: https://github.com/luarocks/hererocks/actions/workflows/test.yml
   :alt: GitHub Workflow Status
 
