@@ -56,7 +56,7 @@ class TestCLI(unittest.TestCase):
     def test_install_latest_lua_with_latest_luarocks(self):
         self.assertHererocksSuccess(["--lua", "latest", "--luarocks", "latest"])
         self.assertHererocksSuccess(["--show"], ["Programs installed in", "Compat: default"])
-        self.assertSuccess(["lua", "-v"], ["Lua 5.4.4"])
+        self.assertSuccess(["lua", "-v"], ["Lua 5.4.5"])
 
         self.assertSuccess(["luarocks", "--version"])
         self.assertSuccess(["luarocks", "make", os.path.join("test", "hererocks-test-scm-1.rockspec")])
@@ -181,11 +181,11 @@ class TestCLI(unittest.TestCase):
 
     def test_install_lua_5_4_with_luarocks_3(self):
         self.assertHererocksSuccess(["--lua", "5.4", "--luarocks", "3"])
-        self.assertHererocksSuccess(["--lua", "5.4.4", "--luarocks", "3"])
+        self.assertHererocksSuccess(["--lua", "5.4.5", "--luarocks", "3"])
 
         if os.name == "nt":
             self.assertHererocksSuccess(["--lua", "5.4", "--luarocks", "3", "--target", "vs"])
-            self.assertHererocksSuccess(["--lua", "5.4.4", "--luarocks", "3", "--target", "vs"])
+            self.assertHererocksSuccess(["--lua", "5.4.5", "--luarocks", "3", "--target", "vs"])
 
 if __name__ == '__main__':
     unittest.main(verbosity=2)
