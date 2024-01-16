@@ -1650,6 +1650,184 @@ class RioLua(Lua):
              LUAI_FUNC void luaF_unlinkupval (UpVal *uv);
              LUAI_FUNC void luaF_freeproto (lua_State *L, Proto *f);
              LUAI_FUNC const char *luaF_getlocalname (const Proto *func, int local_number,
+        """,
+        "read overflow in 'l_strcmp'": """
+            lvm.c:
+            @@ -366,30 +366,32 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
+
+
+             /*
+            -** Compare two strings 'ls' x 'rs', returning an integer less-equal-
+            -** -greater than zero if 'ls' is less-equal-greater than 'rs'.
+            +** Compare two strings 'ts1' x 'ts2', returning an integer less-equal-
+            +** -greater than zero if 'ts1' is less-equal-greater than 'ts2'.
+             ** The code is a little tricky because it allows '\\0' in the strings
+            -** and it uses 'strcoll' (to respect locales) for each segments
+            -** of the strings.
+            +** and it uses 'strcoll' (to respect locales) for each segment
+            +** of the strings. Note that segments can compare equal but still
+            +** have different lengths.
+             */
+            -static int l_strcmp (const TString *ls, const TString *rs) {
+            -  const char *l = getstr(ls);
+            -  size_t ll = tsslen(ls);
+            -  const char *r = getstr(rs);
+            -  size_t lr = tsslen(rs);
+            +static int l_strcmp (const TString *ts1, const TString *ts2) {
+            +  const char *s1 = getstr(ts1);
+            +  size_t rl1 = tsslen(ts1);  /* real length */
+            +  const char *s2 = getstr(ts2);
+            +  size_t rl2 = tsslen(ts2);
+               for (;;) {  /* for each segment */
+            -    int temp = strcoll(l, r);
+            +    int temp = strcoll(s1, s2);
+                 if (temp != 0)  /* not equal? */
+                   return temp;  /* done */
+                 else {  /* strings are equal up to a '\\0' */
+            -      size_t len = strlen(l);  /* index of first '\\0' in both strings */
+            -      if (len == lr)  /* 'rs' is finished? */
+            -        return (len == ll) ? 0 : 1;  /* check 'ls' */
+            -      else if (len == ll)  /* 'ls' is finished? */
+            -        return -1;  /* 'ls' is less than 'rs' ('rs' is not finished) */
+            -      /* both strings longer than 'len'; go on comparing after the '\\0' */
+            -      len++;
+            -      l += len; ll -= len; r += len; lr -= len;
+            +      size_t zl1 = strlen(s1);  /* index of first '\\0' in 's1' */
+            +      size_t zl2 = strlen(s2);  /* index of first '\\0' in 's2' */
+            +      if (zl2 == rl2)  /* 's2' is finished? */
+            +        return (zl1 == rl1) ? 0 : 1;  /* check 's1' */
+            +      else if (zl1 == rl1)  /* 's1' is finished? */
+            +        return -1;  /* 's1' is less than 's2' ('s2' is not finished) */
+            +      /* both strings longer than 'zl'; go on comparing after the '\\0' */
+            +      zl1++; zl2++;
+            +      s1 += zl1; rl1 -= zl1; s2 += zl2; rl2 -= zl2;
+                 }
+               }
+             }
+        """,
+        "Call hook may be called twice when count hook yields": """
+            ldebug.c:
+            @@ -865,6 +865,28 @@ static int changedline (const Proto *p, int oldpc, int newpc) {
+             }
+
+
+            +/*
+            +** Traces Lua calls. If code is running the first instruction of a function,
+            +** and function is not vararg, and it is not coming from an yield,
+            +** calls 'luaD_hookcall'. (Vararg functions will call 'luaD_hookcall'
+            +** after adjusting its variable arguments; otherwise, they could call
+            +** a line/count hook before the call hook. Functions coming from
+            +** an yield already called 'luaD_hookcall' before yielding.)
+            +*/
+            +int luaG_tracecall (lua_State *L) {
+            +  CallInfo *ci = L->ci;
+            +  Proto *p = ci_func(ci)->p;
+            +  ci->u.l.trap = 1;  /* ensure hooks will be checked */
+            +  if (ci->u.l.savedpc == p->code) {  /* first instruction (not resuming)? */
+            +    if (p->is_vararg)
+            +      return 0;  /* hooks will start at VARARGPREP instruction */
+            +    else if (!(ci->callstatus & CIST_HOOKYIELD))  /* not yieded? */
+            +      luaD_hookcall(L, ci);  /* check 'call' hook */
+            +  }
+            +  return 1;  /* keep 'trap' on */
+            +}
+            +
+            +
+             /*
+             ** Traces the execution of a Lua function. Called before the execution
+             ** of each opcode, when debug is on. 'L->oldpc' stores the last
+            ldebug.h:
+            @@ -58,6 +58,7 @@ LUAI_FUNC const char *luaG_addinfo (lua_State *L, const char *msg,
+                                                               TString *src, int line);
+             LUAI_FUNC l_noret luaG_errormsg (lua_State *L);
+             LUAI_FUNC int luaG_traceexec (lua_State *L, const Instruction *pc);
+            +LUAI_FUNC int luaG_tracecall (lua_State *L);
+
+
+             #endif
+            lstate.h:
+            @@ -181,7 +181,7 @@ struct CallInfo {
+               union {
+                 struct {  /* only for Lua functions */
+                   const Instruction *savedpc;
+            -      volatile l_signalT trap;
+            +      volatile l_signalT trap;  /* function is tracing lines/counts */
+                   int nextraargs;  /* # of extra arguments in vararg functions */
+                 } l;
+                 struct {  /* only for C functions */
+            lvm.c:
+            @@ -1157,18 +1157,11 @@ void luaV_execute (lua_State *L, CallInfo *ci) {
+              startfunc:
+               trap = L->hookmask;
+              returning:  /* trap already set */
+            -  cl = clLvalue(s2v(ci->func.p));
+            +  cl = ci_func(ci);
+               k = cl->p->k;
+               pc = ci->u.l.savedpc;
+            -  if (l_unlikely(trap)) {
+            -    if (pc == cl->p->code) {  /* first instruction (not resuming)? */
+            -      if (cl->p->is_vararg)
+            -        trap = 0;  /* hooks will start after VARARGPREP instruction */
+            -      else  /* check 'call' hook */
+            -        luaD_hookcall(L, ci);
+            -    }
+            -    ci->u.l.trap = 1;  /* assume trap is on, for now */
+            -  }
+            +  if (l_unlikely(trap))
+            +    trap = luaG_tracecall(L);
+               base = ci->func.p + 1;
+               /* main loop of interpreter */
+               for (;;) {
+        """,
+        "Wrong line number for function calls": """
+            lparser.c:
+            @@ -1022,10 +1022,11 @@ static int explist (LexState *ls, expdesc *v) {
+             }
+
+
+            -static void funcargs (LexState *ls, expdesc *f, int line) {
+            +static void funcargs (LexState *ls, expdesc *f) {
+               FuncState *fs = ls->fs;
+               expdesc args;
+               int base, nparams;
+            +  int line = ls->linenumber;
+               switch (ls->t.token) {
+                 case '(': {  /* funcargs -> '(' [ explist ] ')' */
+                   luaX_next(ls);
+            @@ -1063,8 +1064,8 @@ static void funcargs (LexState *ls, expdesc *f, int line) {
+               }
+               init_exp(f, VCALL, luaK_codeABC(fs, OP_CALL, base, nparams+1, 2));
+               luaK_fixline(fs, line);
+            -  fs->freereg = base+1;  /* call remove function and arguments and leaves
+            -                            (unless changed) one result */
+            +  fs->freereg = base+1;  /* call removes function and arguments and leaves
+            +                            one result (unless changed later) */
+             }
+
+
+            @@ -1103,7 +1104,6 @@ static void suffixedexp (LexState *ls, expdesc *v) {
+               /* suffixedexp ->
+                    primaryexp { '.' NAME | '[' exp ']' | ':' NAME funcargs | funcargs } */
+               FuncState *fs = ls->fs;
+            -  int line = ls->linenumber;
+               primaryexp(ls, v);
+               for (;;) {
+                 switch (ls->t.token) {
+            @@ -1123,12 +1123,12 @@ static void suffixedexp (LexState *ls, expdesc *v) {
+                     luaX_next(ls);
+                     codename(ls, &key);
+                     luaK_self(fs, v, &key);
+            -        funcargs(ls, v, line);
+            +        funcargs(ls, v);
+                     break;
+                   }
+                   case '(': case TK_STRING: case '{': {  /* funcargs */
+                     luaK_exp2nextreg(fs, v);
+            -        funcargs(ls, v, line);
+            +        funcargs(ls, v);
+                     break;
+                   }
+                   default: return;
         """
     }
     patches_per_version = {
@@ -1708,6 +1886,11 @@ class RioLua(Lua):
                 "Wrong code generation for constants in bitwise operations",
                 "Lua-stack overflow when C stack overflows while handling an error",
                 "'lua_settop' may use a pointer to stack invalidated by 'luaF_close'"
+            ],
+            "6": [
+                "read overflow in 'l_strcmp'",
+                "Call hook may be called twice when count hook yields",
+                "Wrong line number for function calls"
             ]
         },
     }
