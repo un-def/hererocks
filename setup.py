@@ -1,6 +1,8 @@
 import codecs
 import os
+
 import setuptools
+
 
 here = os.path.abspath(os.path.dirname(__file__))
 readme = codecs.open(os.path.join(here, "README.rst"), encoding="UTF-8")

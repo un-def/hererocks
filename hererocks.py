@@ -23,11 +23,12 @@ import tempfile
 import textwrap
 import zipfile
 
+
 try:
-    from urllib2 import urlopen, URLError
+    from urllib2 import URLError, urlopen
 except ImportError:
-    from urllib.request import urlopen
     from urllib.error import URLError
+    from urllib.request import urlopen
 
 if os.name == "nt":
     try:
