@@ -11,23 +11,23 @@ on:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         python-version:
           - '2.7'
           - '3.12'
     steps:
-      - uses: actions/checkout@v3
-      - uses: MatteoH2O1999/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: MatteoH2O1999/setup-python@v3
         with:
           python-version: ${{ matrix.python-version }}
           allow-build: info
           cache-build: true
-      - name: Install flake8
+      - name: Install linters
         run: |
-          pip install --upgrade pip wheel setuptools
-          pip install flake8
-      - name: Run flake8
+          pip install isort flake8
+      - name: Run linters
         run: |
+          isort -q -c -rc .
           flake8
