@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import platform
 import shutil
 import stat
 import subprocess
@@ -141,6 +142,7 @@ class TestCLI(unittest.TestCase):
             self.assertHererocksSuccess(["--lua", "5.3.2", "--patch", "--target", "vs"])
             self.assertSuccess(["lua", "-e", "assert(coroutine.wrap(string.gmatch('x', '.'))() == 'x')"])
 
+    @unittest.skipIf(sys.platform == "darwin" and platform.processor() == "arm", "ARM Macs are not supported")
     def test_install_luajit_with_compat_with_apicheck(self):
         self.assertHererocksSuccess(["--luajit", "latest", "--compat", "5.2", "--cflags=-DLUA_USE_APICHECK"])
 
