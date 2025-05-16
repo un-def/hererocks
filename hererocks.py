@@ -1833,6 +1833,124 @@ class RioLua(Lua):
                      break;
                    }
                    default: return;
+        """,
+        "Wrong code generation for indices with comparisons": """
+            lcode.c:
+            @@ -985,7 +985,7 @@
+             ** or it is a constant.
+             */
+             void luaK_exp2val (FuncState *fs, expdesc *e) {
+            -  if (hasjumps(e))
+            +  if (e->k == VJMP || hasjumps(e))
+                 luaK_exp2anyreg(fs, e);
+               else
+                 luaK_dischargevars(fs, e);
+        """,
+        "Wrong limit for local variables in 16-bit systems": """
+            lparser.c:
+            @@ -198,7 +198,7 @@ static int new_localvar (LexState *ls, TString *name) {
+               checklimit(fs, dyd->actvar.n + 1 - fs->firstlocal,
+                              MAXVARS, "local variables");
+               luaM_growvector(L, dyd->actvar.arr, dyd->actvar.n + 1,
+            -                  dyd->actvar.size, Vardesc, USHRT_MAX, "local variables");
+            +                  dyd->actvar.size, Vardesc, SHRT_MAX, "local variables");
+               var = &dyd->actvar.arr[dyd->actvar.n++];
+               var->vd.kind = VDKREG;  /* default */
+               var->vd.name = name;
+        """,
+        "An emergency GC can collect the __newindex of a metatable (if the metatable is a weak table) while that field is being used in a table update": """
+            lvm.c:
+            @@ -339,7 +339,10 @@ void luaV_finishset (lua_State *L, const TValue *t, TValue *key,
+                   lua_assert(isempty(slot));  /* slot must be empty */
+                   tm = fasttm(L, h->metatable, TM_NEWINDEX);  /* get metamethod */
+                   if (tm == NULL) {  /* no metamethod? */
+            +        sethvalue2s(L, L->top.p, h);  /* anchor 't' */
+            +        L->top.p++;  /* assume EXTRA_STACK */
+                     luaH_finishset(L, h, key, slot, val);  /* set new value */
+            +        L->top.p--;
+                     invalidateTMcache(h);
+                     luaC_barrierback(L, obj2gco(h), val);
+                     return;
+        """,
+        "'luaD_seterrorobj' should not raise errors, because it is called unprotected": """
+            ldo.c:
+            @@ -94,10 +94,6 @@ void luaD_seterrorobj (lua_State *L, int errcode, StkId oldtop) {
+                   setsvalue2s(L, oldtop, G(L)->memerrmsg); /* reuse preregistered msg. */
+                   break;
+                 }
+            -    case LUA_ERRERR: {
+            -      setsvalue2s(L, oldtop, luaS_newliteral(L, "error in error handling"));
+            -      break;
+            -    }
+                 case LUA_OK: {  /* special case only for closing upvalues */
+                   setnilvalue(s2v(oldtop));  /* no error message */
+                   break;
+            @@ -198,6 +194,16 @@ static void correctstack (lua_State *L) {
+             /* some space for error handling */
+             #define ERRORSTACKSIZE	(LUAI_MAXSTACK + 200)
+
+            +
+            +/* raise an error while running the message handler */
+            +l_noret luaD_errerr (lua_State *L) {
+            +  TString *msg = luaS_newliteral(L, "error in error handling");
+            +  setsvalue2s(L, L->top.p, msg);
+            +  L->top.p++;  /* assume EXTRA_STACK */
+            +  luaD_throw(L, LUA_ERRERR);
+            +}
+            +
+            +
+             /*
+             ** Reallocate the stack to a new size, correcting all pointers into it.
+             ** In ISO C, any pointer use after the pointer has been deallocated is
+            @@ -247,7 +253,7 @@ int luaD_growstack (lua_State *L, int n, int raiseerror) {
+                    a stack error; cannot grow further than that. */
+                 lua_assert(stacksize(L) == ERRORSTACKSIZE);
+                 if (raiseerror)
+            -      luaD_throw(L, LUA_ERRERR);  /* error inside message handler */
+            +      luaD_errerr(L);  /* error inside message handler */
+                 return 0;  /* if not 'raiseerror', just signal it */
+               }
+               else if (n < LUAI_MAXSTACK) {  /* avoids arithmetic overflows */
+            ldo.h:
+            @@ -60,6 +60,7 @@
+             /* type of protected functions, to be ran by 'runprotected' */
+             typedef void (*Pfunc) (lua_State *L, void *ud);
+
+            +LUAI_FUNC l_noret luaD_errerr (lua_State *L);
+             LUAI_FUNC void luaD_seterrorobj (lua_State *L, int errcode, StkId oldtop);
+             LUAI_FUNC int luaD_protectedparser (lua_State *L, ZIO *z, const char *name,
+                                                               const char *mode);
+            lstate.c:
+            @@ -166,7 +166,7 @@ void luaE_checkcstack (lua_State *L) {
+               if (getCcalls(L) == LUAI_MAXCCALLS)
+                 luaG_runerror(L, "C stack overflow");
+               else if (getCcalls(L) >= (LUAI_MAXCCALLS / 10 * 11))
+            -    luaD_throw(L, LUA_ERRERR);  /* error while handling stack error */
+            +    luaD_errerr(L);  /* error while handling stack error */
+             }
+
+
+        """,
+        "message handler can be overwritten by a closing variable when closing a thread": """
+            lstate.c:
+            @@ -272,7 +272,9 @@ static void close_state (lua_State *L) {
+                 luaC_freeallobjects(L);  /* just collect its objects */
+               else {  /* closing a fully built state */
+                 L->ci = &L->base_ci;  /* unwind CallInfo list */
+            +    L->errfunc = 0;   /* stack unwind can "throw away" the error function */
+                 luaD_closeprotected(L, 1, LUA_OK);  /* close all upvalues */
+            +    L->top.p = L->stack.p + 1;  /* empty the stack to run finalizers */
+                 luaC_freeallobjects(L);  /* collect all objects */
+                 luai_userstateclose(L);
+               }
+            @@ -328,6 +330,7 @@ int luaE_resetthread (lua_State *L, int status) {
+               if (status == LUA_YIELD)
+                 status = LUA_OK;
+               L->status = LUA_OK;  /* so it can run __close metamethods */
+            +  L->errfunc = 0;   /* stack unwind can "throw away" the error function */
+               status = luaD_closeprotected(L, 1, status);
+               if (status != LUA_OK)  /* errors? */
+                 luaD_seterrorobj(L, status, L->stack.p + 1);
         """
     }
     patches_per_version = {
@@ -1896,6 +2014,13 @@ class RioLua(Lua):
                 "read overflow in 'l_strcmp'",
                 "Call hook may be called twice when count hook yields",
                 "Wrong line number for function calls"
+            ],
+            "7": [
+                "Wrong code generation for indices with comparisons",
+                "Wrong limit for local variables in 16-bit systems",
+                "An emergency GC can collect the __newindex of a metatable (if the metatable is a weak table) while that field is being used in a table update",
+                "'luaD_seterrorobj' should not raise errors, because it is called unprotected",
+                "message handler can be overwritten by a closing variable when closing a thread"
             ]
         },
     }
