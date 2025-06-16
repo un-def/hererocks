@@ -910,17 +910,17 @@ class RioLua(Lua):
         "5.1", "5.1.1", "5.1.2", "5.1.3", "5.1.4", "5.1.5",
         "5.2.0", "5.2.1", "5.2.2", "5.2.3", "5.2.4",
         "5.3.0", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5", "5.3.6",
-        "5.4.0", "5.4.1", "5.4.2", "5.4.3", "5.4.4", "5.4.5", "5.4.6", "5.4.7"
+        "5.4.0", "5.4.1", "5.4.2", "5.4.3", "5.4.4", "5.4.5", "5.4.6", "5.4.7", "5.4.8"
     ]
     translations = {
-        "5": "5.4.7",
+        "5": "5.4.8",
         "5.1": "5.1.5",
         "5.1.0": "5.1",
         "5.2": "5.2.4",
         "5.3": "5.3.6",
-        "5.4": "5.4.7",
-        "^": "5.4.7",
-        "latest": "5.4.7"
+        "5.4": "5.4.8",
+        "^": "5.4.8",
+        "latest": "5.4.8"
     }
     checksums = {
         "lua-5.1.tar.gz"        : "7f5bb9061eb3b9ba1e406a5aa68001a66cb82bac95748839dc02dd10048472c1",
@@ -949,6 +949,7 @@ class RioLua(Lua):
         "lua-5.4.5.tar.gz"      : "59df426a3d50ea535a460a452315c4c0d4e1121ba72ff0bdde58c2ef31d6f444",
         "lua-5.4.6.tar.gz"      : "7d5ea1b9cb6aa0b59ca3dde1c6adcb57ef83a1ba8e5432c0ecd06bf439b3ad88",
         "lua-5.4.7.tar.gz"      : "9fbf5e28ef86c69858f6d3d34eccc32e911c1a28b4120ff3e84aaa70cfbf1e30",
+        "lua-5.4.8.tar.gz"      : "4f18ddae154e793e46eeab727c59ef1c0c0c2b744e7b94219710d76f530629ae",
     }
     all_patches = {
         "When loading a file, Lua may call the reader function again after it returned end of input": """
@@ -3086,8 +3087,8 @@ def main(argv=None):
     parser.add_argument(
         "-l", "--lua", help="Version of standard PUC-Rio Lua to install. "
         "Version can be specified as a version number, e.g. 5.2 or 5.3.1. "
-        "Versions 5.1.0 - 5.4.7 are supported. "
-        "'latest' and '^' are aliases for 5.4.7. "
+        "Versions 5.1.0 - 5.4.8 are supported. "
+        "'latest' and '^' are aliases for 5.4.8. "
         "If the argument contains '@', sources will be downloaded "
         "from a git repo using URI before '@' and using part after '@' as git reference "
         "to checkout, 'master' by default. "
