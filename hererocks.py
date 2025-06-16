@@ -2536,6 +2536,7 @@ class LuaRocks(Program):
         "3.9.0", "3.9.1", "3.9.2",
         "3.10.0",
         "3.11.0", "3.11.1",
+        "3.12.0",
     ]
     translations = {
         "2": "2.4.4",
@@ -2544,7 +2545,7 @@ class LuaRocks(Program):
         "2.2": "2.2.2",
         "2.3": "2.3.0",
         "2.4": "2.4.4",
-        "3": "3.11.1",
+        "3": "3.12.0",
         "3.0": "3.0.4",
         "3.1": "3.1.3",
         "3.2": "3.2.1",
@@ -2557,8 +2558,9 @@ class LuaRocks(Program):
         "3.9": "3.9.2",
         "3.10": "3.10.0",
         "3.11": "3.11.1",
-        "^": "3.11.1",
-        "latest": "3.11.1"
+        "3.12": "3.12.0",
+        "^": "3.12.0",
+        "latest": "3.12.0"
     }
     checksums = {
         "luarocks-2.0.10.tar.gz"   : "11731dfe6e210a962cb2a857b8b2f14a9ab1043e13af09a1b9455b486401b46e",
@@ -2645,6 +2647,8 @@ class LuaRocks(Program):
         "luarocks-3.11.0-win32.zip": "85ddc54c57f6e5a66abb1d913f055a11ab320c701b3781957bc380ae34b4f652",
         "luarocks-3.11.1.tar.gz"   : "c3fb3d960dffb2b2fe9de7e3cb004dc4d0b34bb3d342578af84f84325c669102",
         "luarocks-3.11.1-win32.zip": "d5fb16455ad58c0f22621876d9c9f618216997e582f018a39008dd804daa0a85",
+        "luarocks-3.12.0.tar.gz"   : "3d4c8acddf9b975e77da68cbf748d5baf483d0b6e9d703a844882db25dd61cdf",
+        "luarocks-3.12.0-win32.zip": "e2ebc63dd1b731057a1453c49519a8bee0332ee2084318826a9dc02b690b351b",
     }
 
     def get_download_name(self):
@@ -3117,8 +3121,8 @@ def main(argv=None):
     parser.add_argument(
         "-r", "--luarocks", help="Version of LuaRocks to install. "
         "Version can be specified in the same way as for standard Lua. "
-        "Versions 2.0.8 - 3.11.1 are supported. "
-        "'latest' and '^' are aliases for 3.11.1. "
+        "Versions 2.0.8 - 3.12.0 are supported. "
+        "'latest' and '^' are aliases for 3.12.0. "
         "Default git repo is https://github.com/luarocks/luarocks. "
         "Note that Lua 5.2 is not supported in LuaRocks 2.0.8, "
         "Lua 5.3 is supported only since LuaRocks 2.2.0, Lua 5.4 is supported only since "
